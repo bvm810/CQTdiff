@@ -1,0 +1,67 @@
+# audio len and sr as needed in moliner's code
+audio_len: 44100 # block len actually -- had to reuse this name because of eloi moliner's code
+sample_rate: 44100
+
+# experiment args
+noisy_audio: ""
+output_file: ""
+crossfade_duration: 0.1
+block_duration: 1.0
+overlap_duration: 0.25
+
+filtering:
+  use_postfilter: False
+  use_prefilter: False
+  save_path: /home/bernardo.miranda/Documents/pesquisa/dissertacao/artigos-moliner/cqt-diff/experiments/44100/denoising/filters/pre-only-xi-times-4.mat
+  points_per_band: 100
+  bandpass_power: 10
+  order: 225
+
+# network args
+device: ""
+checkpoint:
+cqt:
+  binsoct: 64 #important
+  numocts: 7  #important
+  fmax: "nyq" # not used
+  fmin: 150 #no worries, not used
+  use_norm: False
+
+# diff params
+diffusion_parameters:
+  sigma_data: 0.057 #default for maestro
+  sigma_min:  1e-6 # 1e-6 in previous experiments 1e-4 in inference
+  sigma_max:  10 # 10 in previous experiments 1 in inference
+  P_mean: -1.2 #what is this for?
+  P_std: 1.2 #ehat is this for?
+  ro:  13 # originally 13 -- 10 seems ok
+  ro_train: 10
+  Schurn: 5
+  Snoise: 1
+  Stmin: 0
+  Stmax: 50
+
+inference:
+  xi:   # default 0.35
+  order: 2  
+  data_consistency: False
+  T: 140
+  max_thresh_grads: 1
+  denoising:
+    noise_files_path: "/home/bernardo.miranda/Documents/pesquisa/datasets/base-ruidos-gramofone/fade-500ms-middle-1600ms"
+    crossfade_duration: 0.1
+    noise_gain:
+    snr_range: 
+
+# noise gains for prelude 20
+  # 10 dB --> 0.006228169426321983
+  # 20 dB --> 0.001969520002603531
+  # 30 dB --> 0.0006228169077076018
+  # 40 dB --> 0.00019695200899150223
+# noise gains for prelude 16
+  # 30 dB --> 0.00151172059122473
+# noise gains for prelude 7
+  # 10 dB --> 0.0033346982672810555
+  # 20 dB --> 0.0010545242112129927
+  # 30 dB --> 0.000333469855831936
+  # 40 dB --> 0.00010545242548687384

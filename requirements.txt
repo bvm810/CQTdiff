@@ -1,14 +1,15 @@
-torch==1.10.2
-torchaudio==0.10.2
+# there is no pytorch version 1.10.2 according to the PyTorch docs --> using 1.11 instead
+# torch==1.10.2
+# torchaudio==0.10.2
+torch==1.11.0
+torchaudio==0.11.0
 SoundFile==0.10.3.post1
 wandb==0.12.17
-Hydra==2.5
 hydra-core==1.1.1
 omegaconf==2.1.1
-numpy==1.19.5
 scipy==1.6.0
 ninja==1.10.2.3
 plotly==5.8.0
 tqdm
-pandas==1.4.0
+pandas
 

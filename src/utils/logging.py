@@ -288,7 +288,9 @@ def write_audio_file(x, sr, string: str, path='tmp/'):
     if not(os.path.exists(path)): 
         os.makedirs(path)
       
+    
     path=path+string+".wav"
+    print(f"Escrevendo arquivo em {path}")
     x=x.flatten()
     x=x.unsqueeze(1)
     x=x.cpu().numpy()

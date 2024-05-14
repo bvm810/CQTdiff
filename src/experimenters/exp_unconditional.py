@@ -50,17 +50,23 @@ class Exp_Unconditional(Exp_Base):
 
         #input("stop")
         #shape=(self.args.inference.unconditional.num_samples, self.args.inference.audio_len)
+        print("Generating unconditional sample")
         shape=(1, self.args.audio_len)
         if self.__plot_animation:
+            print("Plot animation true")
             x_hat, data_denoised, t=self.sampler.predict_unconditional(shape, self.device)
             fig=utils_logging.diffusion_CQT_animation(self.path_reconstructed,  data_denoised, t, self.args, name="animation"+name, resample_factor=4)
         else:
+            print("Plot animation false")
             x_hat=self.sampler.predict_unconditional(shape,self.device)
+
+        print(f"Generated x hat. Shape: {x_hat.shape}")
            
         #apply low pass filter to remove annoying artifacts at the nyquist frequency. I should try to fix this issue in future work
         x_hat=utils_bwe.apply_low_pass(x_hat, self.__filter_final, "firwin") 
 
         #save reconstructed audio file
+        print(f"Variavel path reconstructed: {self.path_reconstructed}")
         audio_path=utils_logging.write_audio_file(x_hat, self.args.sample_rate, name, self.path_reconstructed+"/")
         if self.__plot_animation:
             return audio_path, fig

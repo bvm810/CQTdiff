@@ -1,0 +1,16 @@
+venv/
+cuda11/
+experiments/
+examples.zip
+data_dir
+*.pyc
+*.cpython-39.pyc
+.python-version
+outputs/
+.vscode/
+*.sh
+multirun/
+*.wav
+*/__pycache__/
+notebooks/
+scripts/
