@@ -14,3 +14,4 @@ multirun/
 */__pycache__/
 notebooks/
 scripts/
+iteration_parameters.txt
