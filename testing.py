@@ -50,14 +50,14 @@ def get_test_info(args: dict) -> pd.DataFrame:
 
 
 def prepare_file(args: dict, row: pd.Series, sampler: Sampler78rpm):
-    file = os.path.basename(row["arquivo"])
-    panel_folder = os.path.join(args.testing.folder, f"painel-{args.testing.panel}")
+    file = os.path.basename(row["file"])
+    panel_folder = os.path.join(args.testing.folder, f"panel-{args.testing.panel}")
     noisy_path = os.path.join(panel_folder, "noisy", file)
     denoised_path = os.path.join(panel_folder, args.testing.out, file)
     args.noisy_audio = noisy_path
     args.output_file = denoised_path
-    args.inference.xi = get_xi(row[f"snr-painel-{args.testing.panel}"])
-    args.inference.noise_gain = row[f"noise-gain-painel-{args.testing.panel}"]
+    args.inference.xi = get_xi(row[f"snr-panel-{args.testing.panel}"])
+    args.inference.noise_gain = row[f"noise-gain-panel-{args.testing.panel}"]
     args.inference.snr_range = [0, 40]
     sampler.xi = args.inference.xi
     blocks, out_len = setup_data(args)
