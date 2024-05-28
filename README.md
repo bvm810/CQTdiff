@@ -14,7 +14,7 @@ Although the model was only tested on 78 RPM noise removal tasks, it should work
 * [CUDA](https://developer.nvidia.com/cuda-toolkit) >= 10.2
 * [numpy](https://numpy.org/doc/stable/) 1.24.3
 
-Other requirements can be seen in the ``requirements.txt`` file. This has project has also been tested with CUDA 11.8, pytorch 2.2.0, and torchaudio 2.2.0.
+Other requirements can be seen in the ``requirements.txt`` file. This project has also been tested with CUDA 11.8, pytorch 2.2.0, and torchaudio 2.2.0.
 
 ## Setup
 
@@ -122,8 +122,8 @@ A detailed analysis of the results can be seen on my dissertations. For copyrigh
     * [Results](https://www02.smt.ufrj.br/~bernardo.miranda/master/experiments/validation/validation-results.csv)
 * Tests with artificial signals
     * [Metadata](https://www02.smt.ufrj.br/~bernardo.miranda/master/experiments/artificial-signals/artificial-metadata.csv)
-    * [Objective results](https://www02.smt.ufrj.br/~bernardo.miranda/master/experiments/artificial-signals/artificial-results.csv)
-    * Subjective results (soon)
+    * [Objective results](https://www02.smt.ufrj.br/~bernardo.miranda/master/experiments/artificial-signals/artificial-objective-results.csv)
+    * [Subjective results](https://www02.smt.ufrj.br/~bernardo.miranda/master/experiments/artificial-signals/artificial-subjective-results.csv)
 * Tests with real signals
-    * Metadata(soon)
+    * [Metadata](https://www02.smt.ufrj.br/~bernardo.miranda/master/experiments/historical-signals/historical-metadata.csv)
     * Results (soon)
