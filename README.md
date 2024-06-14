@@ -126,4 +126,4 @@ A detailed analysis of the results can be seen on my dissertations. For copyrigh
     * [Subjective results](https://www02.smt.ufrj.br/~bernardo.miranda/master/experiments/artificial-signals/artificial-subjective-results.csv)
 * Tests with real signals
     * [Metadata](https://www02.smt.ufrj.br/~bernardo.miranda/master/experiments/historical-signals/historical-metadata.csv)
-    * Results (soon)
+    * [Results](https://www02.smt.ufrj.br/~bernardo.miranda/master/experiments/historical-signals/historical-subjective-results.csv)
