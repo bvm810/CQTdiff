@@ -31,7 +31,7 @@ If using pytorch higher than 1.11.0, verify that the correct numpy version is in
 
 The model's weights should also be downloaded if not training from scratch. They can be downloaded [here](https://www02.smt.ufrj.br/~bernardo.miranda/master/weights/weights-2303999.pt).
 
-For removing noise in 78 RPM recordings, a noise dataset is required. The one that was used in the dissertation is available (with metadata on the noise excerpts) [here](https://www02.smt.ufrj.br/~bernardo.miranda/master/weights/noise-dataset).
+For removing noise in 78 RPM recordings, a noise dataset is required. The one that was used in the dissertation is available (with metadata on the noise excerpts) [here](https://www02.smt.ufrj.br/~bernardo.miranda/master/noise-dataset).
 
 ## Usage
 
