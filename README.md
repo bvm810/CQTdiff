@@ -1,10 +1,10 @@
 # diffusion-audio-restoration
 
-This repo is a fork of Eloi Moliner's [CQTDiff](https://github.com/eloimoliner/CQTdiff) diffusion model for solving inverse audio problems, [published in ICASSP 2023](https://arxiv.org/pdf/2210.15228).
+This repo is the ofificial repository of the paper "Diffusion-Based Denoising of Historical Recordings", submitted to the Journal of the Audio Engineering Society in October 2024. It also contains code and results for my [master's dissertation](https://www02.smt.ufrj.br/~bernardo.miranda/diffusion-denoising/dissertation.pdf), and is originally a fork of Eloi Moliner's [CQTDiff](https://github.com/eloimoliner/CQTdiff) diffusion model for solving inverse audio problems, [published in ICASSP 2023](https://arxiv.org/pdf/2210.15228).
 
-For my master's, I adapted the sampling classes of the original model in order to remove background noise in 78 RPM historical recordings. I also retrained it (using the [MAESTRO](https://magenta.tensorflow.org/datasets/maestro) dataset) for 44.1kHz sampling rate, as the original model was trained for 22.05kHz only. 
+I adapted the original sampling classes of the CQTDiff model in order to remove perceptually distributed background noise in historical recordings. I also retrained the original model for 44.1kHz sampling rate using the [MAESTRO](https://magenta.tensorflow.org/datasets/maestro) dataset.
 
-Although the model was only tested on 78 RPM noise removal tasks, it should work for any additive degradation (random or not).
+The model was tested for removing 78 RPM disc noise in historical and artifcially contaminated recordings, and for removing tape hiss in artificially degraded signals.
 
 ## Dependencies
 
@@ -27,21 +27,23 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-If using pytorch higher than 1.11.0, verify that the correct numpy version is installed using ``pip freeze``. Newer numpy versions break Eloi Moliner's constant-Q transform implementation because of changes to ``np.clip``.
+If using pytorch higher than 1.11.0, verify that the correct numpy version is installed using ``pip freeze``. Newer numpy versions break the constant-Q transform implementation because of changes to ``np.clip``.
 
-The model's weights should also be downloaded if not training from scratch. They can be downloaded [here](https://www02.smt.ufrj.br/~bernardo.miranda/master/weights/weights-2303999.pt).
+The model's weights should also be downloaded if not training from scratch. They can be downloaded [here](https://www02.smt.ufrj.br/~bernardo.miranda/diffusion-denoising/weights/weights-2303999.pt).
 
-For removing noise in 78 RPM recordings, a noise dataset is required. The one that was used in the dissertation is available (with metadata on the noise excerpts) [here](https://www02.smt.ufrj.br/~bernardo.miranda/master/noise-dataset).
+Restoration using this model requires a set of noise samples (inference set), which are used during reverse diffusion to simulate the degradation to be removed from the test signal. For 78 RPM noise removal [this](https://www02.smt.ufrj.br/~bernardo.miranda/diffusion-denoising/noise-dataset/gramophone) dataset was used. For tape hiss removal [this](https://www02.smt.ufrj.br/~bernardo.miranda/diffusion-denoising/noise-dataset/tape) dataset was used.
+
+In the 78 RPM noise dataset, the no-fade samples are identical to the original ones, but had their beginning and end removed to avoid fade-in/fade-out effects. The no-fade versions of the train and test set were used in all 78 RPM experiments of the paper and the dissertation.
 
 ## Usage
 
-### Inference on single noisy file
+### Inference on a single noisy file
 
-There are three ``.py``scripts that can be used for conditional sampling with diffusion in this repo: ``sample.py``, ``denoise.py``, and ``inference.py``. For the purpose of reproducing the work I developed in my master's, only ``inference.py`` should be used.
+There are three ``.py``scripts that can be used for conditional sampling with diffusion in this repo: ``sample.py``, ``denoise.py``, and ``inference.py``. For the purpose of reproducing the results in the paper, only ``inference.py`` should be used.
 
 #### ``inference.py``
 
-``inference.py`` is the inference file that was used for the first tests using diffusion to remove 78 RPM noise. It can work on four modes: fixed noise gain, fixed SNR range, estimated gain, and estimated SNR range (see Chapter 4 of my dissertation). In a practical setting, only the last two will be used.
+``inference.py`` is an inference script that was used for preliminary denoising tests for both the dissertation and the paper. It can work on four modes: fixed noise gain, fixed SNR range, estimated gain, and estimated SNR range (see Chapter 4 of my dissertation). In a practical setting, only the last two will be used. All results in the paper use the estimated gain mode, which calculates the power of the degradation noise in reverse diffusion using the sliding window heuristic.
 
 This script is controlled by the ``inference.yaml`` configuration file. The ``audio_len`` attribute defines the block size used in overlap-and-add, and the full path to the model weights should be passed in the ``checkpoint``attribute.
 
@@ -54,7 +56,7 @@ python inference.py noisy_audio=<input_path> output_file=<output_path> device="c
 
 #### ``denoise.py``
 
-``denoise.py`` is the first script I created to denoise a whole musical piece with a single command. It is controlled by the ``denoise.yaml`` configuration file, and is capable only of removing 78 RPM noise with a fixed noise gain or with a fixed SNR range. Aside from this, it is very similar to ``inference.py``. Gain and SNR range cannot be set simultaneously. 
+``denoise.py`` is the first script I created to denoise a whole musical piece with a single command. It is controlled by the ``denoise.yaml`` configuration file, and is capable only of removing background noise with a fixed noise gain or with a fixed SNR range. Aside from this, it is very similar to ``inference.py``. Gain and SNR range cannot be set simultaneously. 
 
 #### ``sample.py``
 
@@ -90,13 +92,13 @@ The idea is that test files can be divided into panels, so that multiple tests c
 
 ``testing.py`` sets the value of $\xi'$ according to an estimate of the noisy signal SNR given by the user. Because of this, and because inference can be done with a fixed gain value, the ``sample-info.csv`` needs to have a ``snr-panel-<id>`` column and a ``noise-gain-panel-<id>`` column, so that each test file can have $\xi'$ and the gain adjusted properly. Below is an example of a valid ``sample-info.csv`` file 
 ```
-arquivo,snr-painel-1,snr-painel-2,noise-gain-painel-1,noise-gain-painel-2
+file,snr-panel-1,snr-panel-2,noise-gain-panel-1,noise-gain-panel-2
 Track 01.wav,10,30,0.01,0.001
 Track 02.wav,10,30,0.02,0.002
 Track 03.wav,10,30,0.03,0.003
 ```
 
-After denoising each file, the results will be saved in ``panel-<id>/<out-folder>``, with the same name of the original noisy file. ``out`` is also an argument of the ``testing`` section. The remaining parameters are defined in the same way as for inference for a single file. Below is an example of usage of the ``testing.py`` script
+After denoising each file, the results will be saved in ``panel-<id>/<out-folder>``, with the same name of the original noisy file. ``out`` determines the output folder base name, and is also an argument of the ``testing`` section. The remaining parameters are defined in the same way as for inference for a single file. Below is an example of usage of the ``testing.py`` script
 ```
 python testing.py testing.folder=<parent-dir> testing.panel=<id> testing.out=<out-folder> device="cuda:1" inference.use_gain=True inference.use_range=False
 ```
@@ -113,17 +115,31 @@ The main addition of this repo is the class ``Sampler78rpm`` in the ``sampler.py
 
 The auxiliary functions for loading the noise samples, extending them if necessary, calculating the appropriate gain for a given SNR, and adding the noise samples to an intermediate diffusion sample can be found in ``src.util.denoising``.
 
-## Experiment results
+## Experiment results (paper)
 
-A detailed analysis of the results can be seen on my dissertations. For copyright reasons, I cannot publicly share the original validation and test files and their restored versions, but their metadata and individual results can be retrieved in the links below.
+The paper provides an in-depth analysis of the objective and subjective experiments evaluating diffusion restoration. For copyright reasons, I cannot share the original clean signals of both objective tests, the historical recordings of the subjective test, and the restored outputs (all tests). However, the metadata and ViSQOL MOS / subjective grade for all of the test signals can be downloaded with the links below.
+
+* Objective tests with 78 RPM noise
+    * [Metadata](https://www02.smt.ufrj.br/~bernardo.miranda/diffusion-denoising/experiments/jaes-paper/gramophone/objective-metadata.csv)
+    * [Results](https://www02.smt.ufrj.br/~bernardo.miranda/diffusion-denoising/experiments/jaes-paper/gramophone/objective-results.csv)
+* Objective tests with tape hiss
+    * [Metadata](https://www02.smt.ufrj.br/~bernardo.miranda/diffusion-denoising/experiments/jaes-paper/tape/objective-metadata.csv)
+    * [Results](https://www02.smt.ufrj.br/~bernardo.miranda/diffusion-denoising/experiments/jaes-paper/tape/objective-results.csv)
+* Subjective tests with historical recordings
+    * [Metadata](https://www02.smt.ufrj.br/~bernardo.miranda/diffusion-denoising/experiments/jaes-paper/gramophone/subjective-metadata.csv)
+    * [Results](https://www02.smt.ufrj.br/~bernardo.miranda/diffusion-denoising/experiments/jaes-paper/gramophone/subjective-results.csv)
+
+## Experiment results (dissertation)
+
+A detailed analysis of the results can be seen in the dissertation. Once again, for copyright reasons, I cannot publicly share the original validation and test files and their restored versions, but their metadata and individual results can be retrieved in the links below.
 
 * Validation
-    * [Metadata](https://www02.smt.ufrj.br/~bernardo.miranda/master/experiments/validation/validation-metadata.csv)
-    * [Results](https://www02.smt.ufrj.br/~bernardo.miranda/master/experiments/validation/validation-results.csv)
+    * [Metadata](https://www02.smt.ufrj.br/~bernardo.miranda/diffusion-denoising/experiments/master/validation/validation-metadata.csv)
+    * [Results](https://www02.smt.ufrj.br/~bernardo.miranda/diffusion-denoising/experiments/master/validation/validation-results.csv)
 * Tests with artificial signals
-    * [Metadata](https://www02.smt.ufrj.br/~bernardo.miranda/master/experiments/artificial-signals/artificial-metadata.csv)
-    * [Objective results](https://www02.smt.ufrj.br/~bernardo.miranda/master/experiments/artificial-signals/artificial-objective-results.csv)
-    * [Subjective results](https://www02.smt.ufrj.br/~bernardo.miranda/master/experiments/artificial-signals/artificial-subjective-results.csv)
+    * [Metadata](https://www02.smt.ufrj.br/~bernardo.miranda/diffusion-denoising/experiments/master/artificial-signals/artificial-metadata.csv)
+    * [Objective results](https://www02.smt.ufrj.br/~bernardo.miranda/diffusion-denoising/experiments/master/artificial-signals/artificial-objective-results.csv)
+    * [Subjective results](https://www02.smt.ufrj.br/~bernardo.miranda/diffusion-denoising/experiments/master/artificial-signals/artificial-subjective-results.csv)
 * Tests with real signals
-    * [Metadata](https://www02.smt.ufrj.br/~bernardo.miranda/master/experiments/historical-recordings/historical-metadata.csv)
-    * [Results](https://www02.smt.ufrj.br/~bernardo.miranda/master/experiments/historical-recordings/historical-subjective-results.csv)
+    * [Metadata](https://www02.smt.ufrj.br/~bernardo.miranda/diffusion-denoising/experiments/master/historical-recordings/historical-metadata.csv)
+    * [Results](https://www02.smt.ufrj.br/~bernardo.miranda/diffusion-denoising/experiments/master/historical-recordings/historical-subjective-results.csv)

@@ -11,7 +11,7 @@ overlap_duration: 0.25
 
 # subjective test args
 testing:
-  folder: "/home/bernardo.miranda/Documents/pesquisa/dissertacao/artigos-moliner/cqt-diff/experiments/44100/tests/subjective-natural"
+  folder: "/home/bernardo.miranda/Documents/pesquisa/dissertacao/artigos-moliner/cqt-diff/experiments/44100/tests/jaes-gramophone"
   panel:
   out: "restored"
 
